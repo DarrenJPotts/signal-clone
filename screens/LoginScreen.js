@@ -1,15 +1,32 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useNavigation } from "react";
+import React, { useState, useNavigation, useEffect } from "react";
 import { Platform } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
 import { View, StyleSheet, Text, KeyboardAvoidingViewBase } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
+import { auth } from "../firebase/firebase";
 
 function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signIn = () => {};
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      console.log(authUser);
+      if (authUser) {
+        navigation.replace("HomeScreen");
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const signIn = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error));
+  };
+
   const register = () => {
     navigation.navigate("RegisterScreen");
   };
@@ -41,6 +58,7 @@ function LoginScreen({ navigation }) {
           type="password"
           value={password}
           onChangeText={(text) => setPassword(text)}
+          onSubmitEditing={signIn}
         />
       </View>
       <View>

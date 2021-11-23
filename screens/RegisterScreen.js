@@ -3,6 +3,7 @@ import React, { useState, useLayoutEffect } from "react";
 import { KeyboardAvoidingView } from "react-native";
 import { View, StyleSheet } from "react-native";
 import { Button, Input, Text } from "react-native-elements";
+import { auth } from "../firebase/firebase";
 
 function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
@@ -16,7 +17,18 @@ function RegisterScreen({ navigation }) {
     });
   }, [navigation]);
 
-  const Register = () => {};
+  const Register = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        authUser.user.updateProfile({
+          displayName: name,
+          photoURL: imageURL || "https://i.pravatar.cc/150?img=68",
+        });
+      })
+      .catch((error) => alert(error));
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
